@@ -150,6 +150,36 @@
   addRow("rows-extintores", extintoresFields());
   addRow("rows-energia", energiaFields());
 
+  /* ---------------- Envío a Google Sheets ---------------- */
+  var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwH2B9alEBh9uCAklh77CSqe3JnhPj5jvOsIWaF8kr-TRaz_KXTBQns_Meh9jld70XRwQ/exec";
+
+  var syncFrame = null;
+  function getSyncFrame(){
+    if (syncFrame) return syncFrame;
+    syncFrame = document.createElement("iframe");
+    syncFrame.name = "hc_pluz_sync_frame";
+    syncFrame.style.display = "none";
+    document.body.appendChild(syncFrame);
+    return syncFrame;
+  }
+
+  function sendToSheet(tabla, common, row){
+    var payload = Object.assign({ tabla: tabla }, common, row);
+    var frame = getSyncFrame();
+    var form = document.createElement("form");
+    form.method = "POST";
+    form.action = GOOGLE_SCRIPT_URL;
+    form.target = frame.name;
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "payload";
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
+  }
+
   /* ---------------- Guardar ---------------- */
   function collectRows(containerId){
     var container = document.getElementById(containerId);
@@ -178,23 +208,29 @@
         return;
       }
 
-      var registro = {
+      var comun = {
         nombre: nombre,
         apellido: apellido,
         anio: anio,
         mes: mes,
-        alcance: opts.alcance,
         fecha_registro: new Date().toISOString()
       };
+
+      var registro = Object.assign({ alcance: opts.alcance }, comun);
       Object.keys(opts.rows).forEach(function(key){
-        registro[key] = collectRows(opts.rows[key]);
+        var group = opts.rows[key];
+        var rows = collectRows(group.containerId);
+        registro[key] = rows;
+        rows.forEach(function(row){
+          sendToSheet(group.tabla, comun, group.map(row));
+        });
       });
 
       var historial = JSON.parse(localStorage.getItem(opts.storageKey) || "[]");
       historial.push(registro);
       localStorage.setItem(opts.storageKey, JSON.stringify(historial));
 
-      statusEl.textContent = "Registro guardado localmente (" + nombre + " " + apellido + " – " + mes + " " + anio + ").";
+      statusEl.textContent = "Registro guardado (" + nombre + " " + apellido + " – " + mes + " " + anio + ").";
       statusEl.style.color = "#3f8a34";
     });
   }
@@ -205,9 +241,27 @@
     alcance: "Alcance 1",
     storageKey: "pluz_huella_alcance1",
     rows: {
-      minicentral: "rows-minicentral",
-      unidades_propias: "rows-unidades",
-      extintores: "rows-extintores"
+      minicentral: {
+        containerId: "rows-minicentral",
+        tabla: "minicentral",
+        map: function(r){
+          return { minicentral: r.minicentral, cantidad: r.monto, tipo_combustible: r.combustible, unidad: r.unidad };
+        }
+      },
+      unidades_propias: {
+        containerId: "rows-unidades",
+        tabla: "vehiculos",
+        map: function(r){
+          return { tipo_vehiculo: r.vehiculo, cantidad: r.monto, tipo_combustible: r.combustible, unidad: r.unidad };
+        }
+      },
+      extintores: {
+        containerId: "rows-extintores",
+        tabla: "extintores",
+        map: function(r){
+          return { tipo_extintor: r.tipo_extintor, cantidad: r.monto, unidad: r.unidad };
+        }
+      }
     }
   });
 
@@ -217,7 +271,13 @@
     alcance: "Alcance 2",
     storageKey: "pluz_huella_alcance2",
     rows: {
-      energia: "rows-energia"
+      energia: {
+        containerId: "rows-energia",
+        tabla: "energia",
+        map: function(r){
+          return { sede: r.sede, consumo: r.monto, unidad: r.unidad };
+        }
+      }
     }
   });
 
