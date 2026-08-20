@@ -185,7 +185,7 @@
   /* ---------------- Adjuntos ---------------- */
   var MAX_FILE_SIZE = 8 * 1024 * 1024; // 8 MB
 
-  function sendFileToDrive(alcance, common, file, onDone){
+  function sendFileToDrive(alcance, seccion, common, file, onDone){
     if (!file){ onDone(); return; }
     if (file.size > MAX_FILE_SIZE){
       onDone(" El archivo supera 8MB y no se adjuntó.");
@@ -196,6 +196,7 @@
       var base64 = String(reader.result).split(",")[1];
       sendToSheet("archivo", common, {
         alcance: alcance,
+        seccion: seccion,
         nombre_archivo: file.name,
         mime_type: file.type || "application/octet-stream",
         contenido: base64
@@ -260,14 +261,27 @@
       statusEl.textContent = baseMsg;
       statusEl.style.color = "#3f8a34";
 
-      if (opts.fileInputId){
-        var fileInput = document.getElementById(opts.fileInputId);
+      Object.keys(opts.rows).forEach(function(key){
+        var group = opts.rows[key];
+        if (!group.fileInputId) return;
+        var fileInput = document.getElementById(group.fileInputId);
         var file = fileInput.files && fileInput.files[0];
         if (file){
-          sendFileToDrive(opts.alcance, comun, file, function(warning){
+          sendFileToDrive(opts.alcance, group.tabla, comun, file, function(warning){
             if (warning) statusEl.textContent = baseMsg + warning;
           });
           fileInput.value = "";
+        }
+      });
+
+      if (opts.fileInputId){
+        var fileInputTop = document.getElementById(opts.fileInputId);
+        var fileTop = fileInputTop.files && fileInputTop.files[0];
+        if (fileTop){
+          sendFileToDrive(opts.alcance, "", comun, fileTop, function(warning){
+            if (warning) statusEl.textContent = baseMsg + warning;
+          });
+          fileInputTop.value = "";
         }
       }
     });
@@ -278,11 +292,11 @@
     prefix: "a1",
     alcance: "Alcance 1",
     storageKey: "pluz_huella_alcance1",
-    fileInputId: "a1-archivo",
     rows: {
       minicentral: {
         containerId: "rows-minicentral",
         tabla: "minicentral",
+        fileInputId: "a1-archivo-minicentral",
         map: function(r){
           return { minicentral: r.minicentral, cantidad: r.monto, tipo_combustible: r.combustible, unidad: r.unidad };
         }
@@ -290,6 +304,7 @@
       unidades_propias: {
         containerId: "rows-unidades",
         tabla: "vehiculos",
+        fileInputId: "a1-archivo-vehiculos",
         map: function(r){
           return { tipo_vehiculo: r.vehiculo, cantidad: r.monto, tipo_combustible: r.combustible, unidad: r.unidad };
         }
@@ -297,6 +312,7 @@
       extintores: {
         containerId: "rows-extintores",
         tabla: "extintores",
+        fileInputId: "a1-archivo-extintores",
         map: function(r){
           return { tipo_extintor: r.tipo_extintor, cantidad: r.monto, unidad: r.unidad };
         }

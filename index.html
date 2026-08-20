@@ -124,6 +124,10 @@
         <div class="accordion-body">
           <div class="rows" id="rows-minicentral"></div>
           <button class="add-btn" type="button" data-add="minicentral">+ Agregar minicentral</button>
+          <div class="attach-row attach-row--inline">
+            <label for="a1-archivo-minicentral">Adjuntar sustento (opcional)</label>
+            <input type="file" id="a1-archivo-minicentral">
+          </div>
         </div>
       </div>
 
@@ -136,6 +140,10 @@
         <div class="accordion-body">
           <div class="rows" id="rows-unidades"></div>
           <button class="add-btn" type="button" data-add="unidades">+ Agregar vehículo</button>
+          <div class="attach-row attach-row--inline">
+            <label for="a1-archivo-vehiculos">Adjuntar sustento (opcional)</label>
+            <input type="file" id="a1-archivo-vehiculos">
+          </div>
         </div>
       </div>
 
@@ -148,12 +156,11 @@
         <div class="accordion-body">
           <div class="rows" id="rows-extintores"></div>
           <button class="add-btn" type="button" data-add="extintores">+ Agregar extintor</button>
+          <div class="attach-row attach-row--inline">
+            <label for="a1-archivo-extintores">Adjuntar sustento (opcional)</label>
+            <input type="file" id="a1-archivo-extintores">
+          </div>
         </div>
-      </div>
-
-      <div class="attach-row">
-        <label for="a1-archivo">Adjuntar sustento (opcional — factura, foto, reporte, etc.)</label>
-        <input type="file" id="a1-archivo">
       </div>
 
       <div class="save-row">
@@ -231,6 +238,6 @@
   <p>PLUZ · Huella de Carbono &middot; Uso interno</p>
 </footer>
 
-<script src="js/app.js?v=4"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>

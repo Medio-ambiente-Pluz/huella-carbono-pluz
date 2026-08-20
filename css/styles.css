@@ -251,6 +251,11 @@ main{
 .attach-row input[type="file"]{
   font-size:.9rem;
 }
+.attach-row--inline{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px dashed var(--border);
+}
 
 /* ---------- Save row ---------- */
 .save-row{
