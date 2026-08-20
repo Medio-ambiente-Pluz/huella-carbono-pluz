@@ -278,7 +278,9 @@
         var fileInputTop = document.getElementById(opts.fileInputId);
         var fileTop = fileInputTop.files && fileInputTop.files[0];
         if (fileTop){
-          sendFileToDrive(opts.alcance, "", comun, fileTop, function(warning){
+          var firstGroupKey = Object.keys(opts.rows)[0];
+          var seccionTop = opts.rows[firstGroupKey].tabla;
+          sendFileToDrive(opts.alcance, seccionTop, comun, fileTop, function(warning){
             if (warning) statusEl.textContent = baseMsg + warning;
           });
           fileInputTop.value = "";
