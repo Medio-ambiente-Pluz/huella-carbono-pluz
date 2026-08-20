@@ -153,23 +153,21 @@
   /* ---------------- Envío a Google Sheets ---------------- */
   var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwH2B9alEBh9uCAklh77CSqe3JnhPj5jvOsIWaF8kr-TRaz_KXTBQns_Meh9jld70XRwQ/exec";
 
-  var syncFrame = null;
-  function getSyncFrame(){
-    if (syncFrame) return syncFrame;
-    syncFrame = document.createElement("iframe");
-    syncFrame.name = "hc_pluz_sync_frame";
-    syncFrame.style.display = "none";
-    document.body.appendChild(syncFrame);
-    return syncFrame;
-  }
+  var syncFrameCounter = 0;
 
   function sendToSheet(tabla, common, row){
     var payload = Object.assign({ tabla: tabla }, common, row);
-    var frame = getSyncFrame();
+    var frameName = "hc_pluz_sync_" + (syncFrameCounter++) + "_" + Date.now();
+
+    var frame = document.createElement("iframe");
+    frame.name = frameName;
+    frame.style.display = "none";
+    document.body.appendChild(frame);
+
     var form = document.createElement("form");
     form.method = "POST";
     form.action = GOOGLE_SCRIPT_URL;
-    form.target = frame.name;
+    form.target = frameName;
     var input = document.createElement("input");
     input.type = "hidden";
     input.name = "payload";
@@ -177,7 +175,11 @@
     form.appendChild(input);
     document.body.appendChild(form);
     form.submit();
-    form.remove();
+
+    setTimeout(function(){
+      form.remove();
+      frame.remove();
+    }, 8000);
   }
 
   /* ---------------- Guardar ---------------- */
