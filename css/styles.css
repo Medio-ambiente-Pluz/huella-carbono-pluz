@@ -235,6 +235,23 @@ main{
 }
 .add-btn:hover{filter:brightness(0.95);}
 
+/* ---------- Attach row ---------- */
+.attach-row{
+  margin-top:24px;
+  padding-top:18px;
+  border-top:1px solid var(--border);
+}
+.attach-row label{
+  display:block;
+  font-size:.85rem;
+  font-weight:600;
+  color:var(--azul-dark);
+  margin-bottom:8px;
+}
+.attach-row input[type="file"]{
+  font-size:.9rem;
+}
+
 /* ---------- Save row ---------- */
 .save-row{
   display:flex;

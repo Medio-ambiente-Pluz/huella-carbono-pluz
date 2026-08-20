@@ -182,6 +182,30 @@
     }, 8000);
   }
 
+  /* ---------------- Adjuntos ---------------- */
+  var MAX_FILE_SIZE = 8 * 1024 * 1024; // 8 MB
+
+  function sendFileToDrive(alcance, common, file, onDone){
+    if (!file){ onDone(); return; }
+    if (file.size > MAX_FILE_SIZE){
+      onDone(" El archivo supera 8MB y no se adjuntó.");
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(){
+      var base64 = String(reader.result).split(",")[1];
+      sendToSheet("archivo", common, {
+        alcance: alcance,
+        nombre_archivo: file.name,
+        mime_type: file.type || "application/octet-stream",
+        contenido: base64
+      });
+      onDone();
+    };
+    reader.onerror = function(){ onDone(" No se pudo leer el archivo adjunto."); };
+    reader.readAsDataURL(file);
+  }
+
   /* ---------------- Guardar ---------------- */
   function collectRows(containerId){
     var container = document.getElementById(containerId);
@@ -232,8 +256,20 @@
       historial.push(registro);
       localStorage.setItem(opts.storageKey, JSON.stringify(historial));
 
-      statusEl.textContent = "Registro guardado (" + nombre + " " + apellido + " – " + mes + " " + anio + ").";
+      var baseMsg = "Registro guardado (" + nombre + " " + apellido + " – " + mes + " " + anio + ").";
+      statusEl.textContent = baseMsg;
       statusEl.style.color = "#3f8a34";
+
+      if (opts.fileInputId){
+        var fileInput = document.getElementById(opts.fileInputId);
+        var file = fileInput.files && fileInput.files[0];
+        if (file){
+          sendFileToDrive(opts.alcance, comun, file, function(warning){
+            if (warning) statusEl.textContent = baseMsg + warning;
+          });
+          fileInput.value = "";
+        }
+      }
     });
   }
 
@@ -242,6 +278,7 @@
     prefix: "a1",
     alcance: "Alcance 1",
     storageKey: "pluz_huella_alcance1",
+    fileInputId: "a1-archivo",
     rows: {
       minicentral: {
         containerId: "rows-minicentral",
@@ -272,6 +309,7 @@
     prefix: "a2",
     alcance: "Alcance 2",
     storageKey: "pluz_huella_alcance2",
+    fileInputId: "a2-archivo",
     rows: {
       energia: {
         containerId: "rows-energia",
