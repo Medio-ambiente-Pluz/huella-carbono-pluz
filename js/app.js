@@ -246,7 +246,9 @@
       var registro = Object.assign({ alcance: opts.alcance }, comun);
       Object.keys(opts.rows).forEach(function(key){
         var group = opts.rows[key];
-        var rows = collectRows(group.containerId);
+        var rows = collectRows(group.containerId).filter(function(r){
+          return Object.keys(r).some(function(k){ return r[k] !== ""; });
+        });
         registro[key] = rows;
         rows.forEach(function(row){
           sendToSheet(group.tabla, comun, group.map(row));
