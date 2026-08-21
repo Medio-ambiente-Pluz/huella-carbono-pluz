@@ -98,8 +98,7 @@ main{
 }
 .card h3{color:var(--azul-dark); margin-top:28px;}
 
-.steps{padding-left:20px; line-height:1.8;}
-.steps li{margin-bottom:4px;}
+.icon{width:26px; height:26px; display:block;}
 
 .scope-cards{
   display:grid;
@@ -109,14 +108,59 @@ main{
 }
 .scope-card{
   border-radius:10px;
-  padding:16px 18px;
+  padding:18px 18px;
   color:#fff;
 }
+.scope-icon{
+  width:44px; height:44px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.18);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:10px;
+}
+.scope-icon .icon{width:26px; height:26px; color:#fff;}
 .scope-card h4{margin:0 0 6px; font-size:1.05rem;}
 .scope-card p{margin:0; font-size:.88rem; line-height:1.4; opacity:.95;}
 .scope1{background:var(--azul);}
 .scope2{background:var(--verde);}
 .scope3{background:#E0A62A;}
+
+/* ---------- Pasos (infografía) ---------- */
+.steps-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:22px 16px;
+  margin-top:20px;
+}
+.step-card{
+  position:relative;
+  background:#F7F9FD;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:20px 16px 16px;
+}
+.step-num{
+  position:absolute;
+  top:-12px; left:14px;
+  background:var(--amarillo);
+  color:#5a3d00;
+  font-weight:800;
+  font-size:.8rem;
+  width:26px; height:26px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 4px rgba(0,0,0,0.15);
+}
+.step-icon{
+  color:var(--azul);
+  margin-bottom:10px;
+}
+.step-card p{
+  margin:0;
+  font-size:.87rem;
+  line-height:1.45;
+  color:var(--text);
+}
 
 .note{
   margin-top:22px;
