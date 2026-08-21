@@ -39,12 +39,14 @@
   /* ---------------- Catálogos ---------------- */
   var COMBUSTIBLES = ["Diésel B5", "Gasolina 84", "Gasolina 90", "Gasolina 95", "GLP", "Otros"];
   var UNIDADES = ["gal", "m3", "L", "kg", "Otros"];
-  var MINICENTRALES = ["Canta", "Yaso", "Otros"];
+  var MINICENTRALES = ["Canta", "Santo Domingo de Nava", "RAvira Pacaraos", "Acos"];
   var VEHICULOS = ["Camioneta", "Automóvil", "Motocicleta", "Camión", "Otros"];
-  var TIPO_EXTINTOR = ["PQS", "CO2", "Otros"];
+  var TIPO_EXTINTOR = ["CO2 - 15 Lbs", "CO2 - 10 Lbs", "CO2 - 5Kg", "CO2 - 12 Kg", "CO2 - 50 Kg"];
   var UNIDAD_EXTINTOR = ["kg", "lb", "unidad"];
   var SEDES = ["Canta", "Yaso", "Oficina Lima", "Otros"];
   var UNIDAD_ENERGIA = ["kWh", "MWh"];
+  var ETAPA_SF6 = ["Nuevos", "Operación", "Disposición"];
+  var UNIDAD_SF6 = ["Kilogramos"];
 
   function makeSelect(options, placeholder){
     var sel = document.createElement("select");
@@ -78,6 +80,13 @@
     return input;
   }
 
+  function makeTextInput(placeholder){
+    var input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = placeholder || "";
+    return input;
+  }
+
   /* ---------------- Row builders ---------------- */
   function addRow(containerId, fieldsConfig){
     var container = document.getElementById(containerId);
@@ -87,6 +96,7 @@
     fieldsConfig.forEach(function(cfg){
       var input;
       if (cfg.type === "select") input = makeSelect(cfg.options, cfg.placeholder);
+      else if (cfg.type === "text") input = makeTextInput(cfg.placeholder);
       else input = makeNumberInput(cfg.placeholder);
       input.dataset.key = cfg.key;
       row.appendChild(makeField(cfg.label, input));
@@ -133,6 +143,16 @@
       { key:"unidad", label:"Unidad de medida", type:"select", options:UNIDAD_ENERGIA }
     ];
   }
+  function sf6Fields(){
+    return [
+      { key:"etapa", label:"Etapa", type:"select", options:ETAPA_SF6 },
+      { key:"ubicacion", label:"Ubicación (Set)", type:"text", placeholder:"Ubicación" },
+      { key:"num_equipos", label:"Número de equipos", type:"text", placeholder:"Número de equipos" },
+      { key:"recargo", label:"Recargo", type:"text", placeholder:"Recargo" },
+      { key:"unidad", label:"Unidad", type:"select", options:UNIDAD_SF6 },
+      { key:"fuga_pct", label:"% de fuga", type:"text", placeholder:"% de fuga" }
+    ];
+  }
 
   document.querySelectorAll("[data-add]").forEach(function(btn){
     btn.addEventListener("click", function(){
@@ -140,6 +160,7 @@
       if (group === "minicentral") addRow("rows-minicentral", minicentralFields());
       if (group === "unidades") addRow("rows-unidades", unidadesFields());
       if (group === "extintores") addRow("rows-extintores", extintoresFields());
+      if (group === "sf6") addRow("rows-sf6", sf6Fields());
       if (group === "energia") addRow("rows-energia", energiaFields());
     });
   });
@@ -148,6 +169,7 @@
   addRow("rows-minicentral", minicentralFields());
   addRow("rows-unidades", unidadesFields());
   addRow("rows-extintores", extintoresFields());
+  addRow("rows-sf6", sf6Fields());
   addRow("rows-energia", energiaFields());
 
   /* ---------------- Envío a Google Sheets ---------------- */
@@ -319,6 +341,14 @@
         fileInputId: "a1-archivo-extintores",
         map: function(r){
           return { tipo_extintor: r.tipo_extintor, cantidad: r.monto, unidad: r.unidad };
+        }
+      },
+      sf6: {
+        containerId: "rows-sf6",
+        tabla: "sf6",
+        fileInputId: "a1-archivo-sf6",
+        map: function(r){
+          return { etapa: r.etapa, ubicacion: r.ubicacion, num_equipos: r.num_equipos, recargo: r.recargo, unidad: r.unidad, fuga_pct: r.fuga_pct };
         }
       }
     }
